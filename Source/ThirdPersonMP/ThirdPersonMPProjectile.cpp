@@ -4,6 +4,7 @@
 #include "ThirdPersonMPProjectile.h"
 #include "Components/SphereComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -18,6 +19,11 @@ AThirdPersonMPProjectile::AThirdPersonMPProjectile()
 	SphereComponent->InitSphereRadius(37.5f);
 	SphereComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = SphereComponent;
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		SphereComponent->OnComponentHit.AddDynamic(this, &AThirdPersonMPProjectile::OnProjectileImpact);
+	}
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -52,6 +58,24 @@ void AThirdPersonMPProjectile::BeginPlay()
 	Super::BeginPlay();
 	
 }
+
+void AThirdPersonMPProjectile::Destroyed()
+{
+	FVector SpawnLocation = GetActorLocation();
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, SpawnLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+}
+
+void AThirdPersonMPProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor)
+	{
+		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, NormalImpulse, Hit, GetInstigator()->Controller, this, DamageType);
+	}
+
+	Destroy();
+}
+
+
 
 // Called every frame
 void AThirdPersonMPProjectile::Tick(float DeltaTime)
