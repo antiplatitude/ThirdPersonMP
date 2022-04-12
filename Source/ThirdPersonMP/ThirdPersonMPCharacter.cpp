@@ -176,3 +176,11 @@ void AThirdPersonMPCharacter::SetCurrentHealth(float HealthValue)
 	}
 }
 
+float AThirdPersonMPCharacter::TakeDamage(float DamageTaken, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamageApplied = CurrentHealth - DamageTaken;
+	SetCurrentHealth(DamageApplied);
+	return DamageApplied;
+}
+
+
