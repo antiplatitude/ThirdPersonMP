@@ -120,13 +120,8 @@ void AThirdPersonMPCharacter::HandleFire_Implementation()
 	SpawnParameters.Instigator = GetInstigator();
 	SpawnParameters.Owner = this;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString(TEXT("Attempting to fire")));
 	AThirdPersonMPProjectile* SpawnedProjectile = GetWorld()->SpawnActor<AThirdPersonMPProjectile>(SpawnLocation, SpawnRotation, SpawnParameters);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString(TEXT("Projectile Fired")));
 }
-
-
-
 
 //////////////////////////////////////////////////////////////////////////
 // Input
